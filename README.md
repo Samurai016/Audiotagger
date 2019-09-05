@@ -1,5 +1,6 @@
 # audiotagger
 ![build status](https://img.shields.io/badge/build-passing-brightgreen?style=flat-square)
+[![pub](https://img.shields.io/pub/v/audiotagger?style=flat-square)](https://pub.dev/packages/audiotagger)
 
 This library allow yoy to read and write ID3 tags to MP3 files.
 

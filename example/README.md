@@ -2,15 +2,19 @@
 
 Demonstrates how to use the audiotagger plugin.
 
-## Getting Started
+> **Actually works only on Android.**
 
-This project is a starting point for a Flutter application.
+The app has has an output widget and 3 buttons.
 
-A few resources to get you started if this is your first Flutter project:
+## Explanation
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+Initially the utput widget will be a `Text` widget with writed *Ready..*
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+By clicking *Read tags* you'll fire `tagger.readTagsAsMap` method, and the output will be showed you as a JSON string in `Text` widget.  
+This widget will replace the output one.
+
+By clicking *Read artwork* you'll fire `tagger.readArtwork` method, and the output will show you the image in the output widget.
+
+By clicking *Write tags* you'll fire `tagger.writeTagsFromMap` method, and the output will be showed you  in `Text` widget.
+The text will be *true* if the operation success, *false* instead.  
+This widget will replace the output one.
