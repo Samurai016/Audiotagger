@@ -9,7 +9,7 @@ This library allow yoy to read and write ID3 tags to MP3 files.
 ## Add dependency
 ```yaml
 dependencies:
-  audiotagger: ^1.0.0
+  audiotagger: ^1.0.1
 ```
 
 ## Table of contents

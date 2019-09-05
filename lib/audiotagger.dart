@@ -51,7 +51,7 @@ class Audiotagger {
     });
   }
 
-    /// Method to write ID3 tags to MP3 file.
+  /// Method to write ID3 tags to MP3 file.
   ///
   /// [path]: The path of the file.
   ///
