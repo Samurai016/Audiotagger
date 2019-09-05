@@ -43,7 +43,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future _readTags() async {
-    final output = await tagger.readTags(
+    final output = await tagger.readTagsAsMap(
       path: filePath,
       checkPermission: true,
     );  
