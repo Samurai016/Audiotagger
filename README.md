@@ -9,8 +9,14 @@ This library allow yoy to read and write ID3 tags to MP3 files.
 ## Add dependency
 ```yaml
 dependencies:
-  audiotagger: ^1.0.1
+  audiotagger: ^1.0.2
 ```
+Audiotagger need accesso to read and write storage. To do this, add this lines in your `AndroidManifest.xml` (inside `manifest` tag, see [example manifest](./example/android/app/src/main/AndroidManifest.xml#L4) to check).
+```xml
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+```
+Than you can use you preferred way to request them or simply set `checkPermission` flag to `true`.
 
 ## Table of contents
 - [Basic usage](#basic-usage-for-any-operation)
@@ -42,10 +48,10 @@ You can get a `Map` of the ID3 tags.
 ```dart
 void getTagsAsMap() async {
     final String filePath = "/storage/emulated/0/file.mp3";
-    final Map map = await tagger.readTagsAsMap({
+    final Map map = await tagger.readTagsAsMap(
         path: filePath,
         checkPermission: true,
-    });
+    );
 }
 ```
 [**This method does not read the artwork of the song. To do this, use the `readArtwork` method.**](#read-artwork)
@@ -57,10 +63,10 @@ You can get a `Tag` object of the ID3 tags.
 ```dart
 void getTags() async {
     final String filePath = "/storage/emulated/0/file.mp3";
-    final Tag tag = await tagger.readTags({
+    final Tag tag = await tagger.readTags(
         path: filePath,
         checkPermission: true,
-    });
+    );
 }
 ```
 
@@ -73,10 +79,10 @@ To get the artwork of the song, use this method.
 ```dart
 void getArtwork() async {
     final String filePath = "/storage/emulated/0/file.mp3";
-    final Uint8List bytes = await tagger.readArtwork({
+    final Uint8List bytes = await tagger.readArtwork(
         path: filePath,
         checkPermission: true,
-    });
+    );
 }
 ```
 

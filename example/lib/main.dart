@@ -14,26 +14,26 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final filePath = "/storage/emulated/0/Music/test.mp3";
+  final filePath = "/storage/emulated/0/Music/test.webm";
   Widget result;
   Audiotagger tagger = new Audiotagger();
 
   Future _writeTags() async {
     final tags = <String, String>{
-      "titolo": "Ciao belli",
-      "artista": "Non lo so",
+      "title": "Ciao belli",
+      "artist": "Non lo so",
       "album": "Canzone bella",
-      "anno": "1973",
+      "year": "1973",
     };
 
-    final artworkPath = "/storage/emulated/0/Music/artwork.jpg";
-    final artworkFile = new File(artworkPath);
-    final artwork = await artworkFile.readAsBytes();
+    // final artworkPath = "/storage/emulated/0/Music/artwork.jpg";
+    // final artworkFile = new File(artworkPath);
+    // final artwork = await artworkFile.readAsBytes();
 
     final output = await tagger.writeTagsFromMap(
       path: filePath,
       tags: tags,
-      artwork: artwork,
+      //artwork: artwork,
       checkPermission: true,
     );
 
