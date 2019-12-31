@@ -9,7 +9,7 @@ This library allow yoy to read and write ID3 tags to MP3 files.
 ## Add dependency
 ```yaml
 dependencies:
-  audiotagger: ^1.0.2
+  audiotagger: ^1.0.3
 ```
 Audiotagger need accesso to read and write storage. To do this, add this lines in your `AndroidManifest.xml` (inside `manifest` tag, see [example manifest](./example/android/app/src/main/AndroidManifest.xml#L4) to check).
 ```xml

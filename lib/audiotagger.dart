@@ -77,7 +77,7 @@ class Audiotagger {
     return await _channel.invokeMethod("writeTags", {
       "path": path,
       "tags": tag.toMap(),
-      "artwork": tag.artwork != null ? Uint8List.fromList(tag.artwork) : null,
+      "artwork": tag.artwork,
       "version": version.index,
     });
   }

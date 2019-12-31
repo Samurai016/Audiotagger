@@ -6,3 +6,7 @@
 
 * Fixed bug in `writeTags` when `artwork` field was not provided.
 * Updated dependecies, examples and README.
+
+## 1.0.3
+
+* Increased performance.
