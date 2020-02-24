@@ -87,7 +87,6 @@ public class AudiotaggerPlugin implements MethodCallHandler {
             File mp3File = new File(path);
             AudioFile audioFile = AudioFileIO.read(mp3File);
 
-            audioFile.setTag(version.equals(Version.ID3V1) ? new ID3v1Tag() : new ID3v24Tag());
             Tag newTag = audioFile.getTagAndConvertOrCreateAndSetDefault();
 
             Util.setFieldIfExist(newTag, FieldKey.TITLE, map, "title");
