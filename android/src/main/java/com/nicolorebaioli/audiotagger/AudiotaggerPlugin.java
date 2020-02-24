@@ -121,6 +121,9 @@ public class AudiotaggerPlugin implements MethodCallHandler {
                     // dui下面的内容做特殊处理
                     cover = ArtworkFactory.createArtworkFromFile(new File(artwork));
 
+                    // 删除已有的专辑封面
+                    newTag.deleteArtworkField();
+
                     if(newTag instanceof Mp4Tag){
                         RandomAccessFile imageFile = new RandomAccessFile(new File(artwork),"r");
                         byte[] imageData = new byte[(int)imageFile.length()];
@@ -154,6 +157,7 @@ public class AudiotaggerPlugin implements MethodCallHandler {
                 }
 
                 if(newTag instanceof ID3v1Tag||newTag instanceof ID3v24Tag){
+
                     newTag.setField(cover);
                 }
             }
