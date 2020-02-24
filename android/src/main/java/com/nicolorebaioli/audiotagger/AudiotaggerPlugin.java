@@ -5,29 +5,22 @@ import android.content.Context;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 
-import com.google.gson.Gson;
-
-import org.jaudiotagger.audio.flac.metadatablock.MetadataBlockDataPicture;
-import org.jaudiotagger.audio.generic.AbstractTag;
-import org.jaudiotagger.tag.flac.FlacTag;
-import org.jaudiotagger.tag.id3.valuepair.ImageFormats;
-import org.jaudiotagger.tag.id3.valuepair.TextEncoding;
-import org.jaudiotagger.tag.mp4.Mp4Tag;
-import org.jaudiotagger.tag.reference.PictureTypes;
-import org.jaudiotagger.tag.vorbiscomment.VorbisCommentFieldKey;
-import org.jaudiotagger.tag.vorbiscomment.VorbisCommentTag;
-import org.jaudiotagger.tag.vorbiscomment.util.Base64Coder;
-import  org.json.*;
-
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.tag.FieldDataInvalidException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.flac.FlacTag;
 import org.jaudiotagger.tag.id3.ID3v1Tag;
 import org.jaudiotagger.tag.id3.ID3v24Tag;
+import org.jaudiotagger.tag.id3.valuepair.ImageFormats;
 import org.jaudiotagger.tag.images.Artwork;
 import org.jaudiotagger.tag.images.ArtworkFactory;
+import org.jaudiotagger.tag.mp4.Mp4Tag;
+import org.jaudiotagger.tag.reference.PictureTypes;
+import org.jaudiotagger.tag.vorbiscomment.VorbisCommentFieldKey;
+import org.jaudiotagger.tag.vorbiscomment.VorbisCommentTag;
+import org.jaudiotagger.tag.vorbiscomment.util.Base64Coder;
 
 import java.io.File;
 import java.io.RandomAccessFile;
@@ -49,8 +42,6 @@ public class AudiotaggerPlugin implements MethodCallHandler {
      */
     private Context context;
 
-    enum Version {ID3V1, ID3V2}
-
     private AudiotaggerPlugin(Context context) {
         this.context = context;
     }
@@ -67,7 +58,7 @@ public class AudiotaggerPlugin implements MethodCallHandler {
                 result.success("Android " + android.os.Build.VERSION.RELEASE);
                 break;
             case "writeTags":
-                if (call.hasArgument("path") && call.hasArgument("tags")&& call.hasArgument("artwork")) {
+                if (call.hasArgument("path") && call.hasArgument("tags") && call.hasArgument("artwork")) {
                     String path = call.argument("path");
                     HashMap<String, String> map = call.argument("tags");
                     String artwork = call.argument("artwork");
@@ -77,13 +68,13 @@ public class AudiotaggerPlugin implements MethodCallHandler {
                 break;
             case "readTags":
                 if (call.hasArgument("path"))
-                    result.success(readTags((String)call.argument("path")));
+                    result.success(readTags((String) call.argument("path")));
                 else
                     result.error("400", "Missing parameter", null);
                 break;
             case "readArtwork":
                 if (call.hasArgument("path"))
-                    result.success(readArtwork((String)call.argument("path")));
+                    result.success(readArtwork((String) call.argument("path")));
                 else
                     result.error("400", "Missing parameter", null);
                 break;
@@ -92,7 +83,7 @@ public class AudiotaggerPlugin implements MethodCallHandler {
         }
     }
 
-    private boolean writeTags(String path, HashMap<String, String> map,String artwork) {
+    private boolean writeTags(String path, HashMap<String, String> map, String artwork) {
         try {
             File mp3File = new File(path);
             AudioFile audioFile = AudioFileIO.read(mp3File);
@@ -113,51 +104,41 @@ public class AudiotaggerPlugin implements MethodCallHandler {
             Util.setFieldIfExist(newTag, FieldKey.YEAR, map, "year");
 
             Artwork cover = null;
-            if (artwork != null && artwork.trim().length()>0 ) {
+            if (artwork != null && artwork.trim().length() > 0) {
 
-                if(artwork.startsWith("http://")||artwork.startsWith("https://")){
-                    cover = ArtworkFactory.createLinkedArtworkFromURL(artwork);
+                // 删除已有的专辑封面
+                newTag.deleteArtworkField();
+
+                // dui下面的内容做特殊处理
+                cover = ArtworkFactory.createArtworkFromFile(new File(artwork));
+
+                if (newTag instanceof Mp4Tag) {
+                    RandomAccessFile imageFile = new RandomAccessFile(new File(artwork), "r");
+                    byte[] imageData = new byte[(int) imageFile.length()];
+                    imageFile.read(imageData);
+                    newTag.setField(((Mp4Tag) newTag).createArtworkField(imageData));
+                }else if (newTag instanceof FlacTag) {
+                    RandomAccessFile imageFile = new RandomAccessFile(new File(artwork), "r");
+                    byte[] imageData = new byte[(int) imageFile.length()];
+                    imageFile.read(imageData);
+                    newTag.setField(((FlacTag) newTag).createArtworkField(imageData,
+                            PictureTypes.DEFAULT_ID,
+                            ImageFormats.MIME_TYPE_JPEG,
+                            "test",
+                            0,
+                            0,
+                            24,
+                            0));
+                }else if (newTag instanceof VorbisCommentTag) {
+                    RandomAccessFile imageFile = new RandomAccessFile(new File(artwork), "r");
+                    byte[] imageData = new byte[(int) imageFile.length()];
+                    imageFile.read(imageData);
+                    char[] base64Data = Base64Coder.encode(imageData);
+                    String base64image = new String(base64Data);
+                    newTag.setField(((VorbisCommentTag) newTag).createField(VorbisCommentFieldKey.COVERART, base64image));
+                    newTag.setField(((VorbisCommentTag) newTag).createField(VorbisCommentFieldKey.COVERARTMIME, "image/png"));
                 }else {
-                    // dui下面的内容做特殊处理
                     cover = ArtworkFactory.createArtworkFromFile(new File(artwork));
-
-                    // 删除已有的专辑封面
-                    newTag.deleteArtworkField();
-
-                    if(newTag instanceof Mp4Tag){
-                        RandomAccessFile imageFile = new RandomAccessFile(new File(artwork),"r");
-                        byte[] imageData = new byte[(int)imageFile.length()];
-                        imageFile.read(imageData);
-                        newTag.setField(((Mp4Tag) newTag).createArtworkField(imageData));
-                    }
-
-                    if(newTag instanceof FlacTag){
-                        RandomAccessFile imageFile = new RandomAccessFile(new File(artwork), "r");
-                        byte[] imageData = new byte[(int) imageFile.length()];
-                        imageFile.read(imageData);
-                        newTag.setField(((FlacTag) newTag).createArtworkField(imageData,
-                                PictureTypes.DEFAULT_ID,
-                                ImageFormats.MIME_TYPE_JPEG,
-                                "test",
-                                0,
-                                0,
-                                24,
-                                0));
-                    }
-
-                    if (newTag instanceof VorbisCommentTag){
-                        RandomAccessFile imageFile = new RandomAccessFile(new File(artwork),"r");
-                        byte[] imageData = new byte[(int)imageFile.length()];
-                        imageFile.read(imageData);
-                        char[] base64Data = Base64Coder.encode(imageData);
-                        String base64image = new String(base64Data);
-                        newTag.setField(((VorbisCommentTag) newTag).createField(VorbisCommentFieldKey.COVERART,base64image));
-                        newTag.setField(((VorbisCommentTag) newTag).createField(VorbisCommentFieldKey.COVERARTMIME,"image/png"));
-                    }
-                }
-
-                if(newTag instanceof ID3v1Tag||newTag instanceof ID3v24Tag){
-
                     newTag.setField(cover);
                 }
             }
@@ -222,6 +203,8 @@ public class AudiotaggerPlugin implements MethodCallHandler {
         }
         return null;
     }
+
+    enum Version {ID3V1, ID3V2}
 
     static class Util {
         @SuppressLint("NewApi")
