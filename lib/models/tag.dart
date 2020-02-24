@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 class Tag {
   String title;
   String artist;
@@ -13,7 +11,7 @@ class Tag {
   String album;
   String albumArtist;
   String year;
-  Uint8List artwork;
+  String artwork;
 
   Tag({
     this.title,
@@ -60,6 +58,7 @@ class Tag {
       "album": album,
       "albumArtist": albumArtist,
       "year": year,
+      "String": artwork,
     };
   }
 }

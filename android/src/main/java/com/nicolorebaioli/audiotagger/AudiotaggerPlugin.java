@@ -7,6 +7,16 @@ import android.net.Uri;
 
 import com.google.gson.Gson;
 
+import org.jaudiotagger.audio.flac.metadatablock.MetadataBlockDataPicture;
+import org.jaudiotagger.audio.generic.AbstractTag;
+import org.jaudiotagger.tag.flac.FlacTag;
+import org.jaudiotagger.tag.id3.valuepair.ImageFormats;
+import org.jaudiotagger.tag.id3.valuepair.TextEncoding;
+import org.jaudiotagger.tag.mp4.Mp4Tag;
+import org.jaudiotagger.tag.reference.PictureTypes;
+import org.jaudiotagger.tag.vorbiscomment.VorbisCommentFieldKey;
+import org.jaudiotagger.tag.vorbiscomment.VorbisCommentTag;
+import org.jaudiotagger.tag.vorbiscomment.util.Base64Coder;
 import  org.json.*;
 
 import org.jaudiotagger.audio.AudioFile;
@@ -20,6 +30,7 @@ import org.jaudiotagger.tag.images.Artwork;
 import org.jaudiotagger.tag.images.ArtworkFactory;
 
 import java.io.File;
+import java.io.RandomAccessFile;
 import java.util.HashMap;
 
 import io.flutter.Log;
@@ -56,12 +67,11 @@ public class AudiotaggerPlugin implements MethodCallHandler {
                 result.success("Android " + android.os.Build.VERSION.RELEASE);
                 break;
             case "writeTags":
-                if (call.hasArgument("path") && call.hasArgument("tags") && call.hasArgument("version")) {
+                if (call.hasArgument("path") && call.hasArgument("tags")&& call.hasArgument("artwork")) {
                     String path = call.argument("path");
                     HashMap<String, String> map = call.argument("tags");
-                    byte[] artwork = call.argument("artwork");
-                    Version version = Version.values()[(int) call.argument("version")];
-                    result.success(writeTags(path, map, artwork, version));
+                    String artwork = call.argument("artwork");
+                    result.success(writeTags(path, map, artwork));
                 } else
                     result.error("400", "Missing parameters", null);
                 break;
@@ -82,13 +92,12 @@ public class AudiotaggerPlugin implements MethodCallHandler {
         }
     }
 
-    private boolean writeTags(String path, HashMap<String, String> map, byte[] artwork, Version version) {
+    private boolean writeTags(String path, HashMap<String, String> map,String artwork) {
         try {
             File mp3File = new File(path);
             AudioFile audioFile = AudioFileIO.read(mp3File);
 
-            audioFile.setTag(version.equals(Version.ID3V1) ? new ID3v1Tag() : new ID3v24Tag());
-            Tag newTag = audioFile.getTagAndConvertOrCreateAndSetDefault();
+            Tag newTag = audioFile.getTag();
 
             Util.setFieldIfExist(newTag, FieldKey.TITLE, map, "title");
             Util.setFieldIfExist(newTag, FieldKey.ARTIST, map, "artist");
@@ -103,12 +112,51 @@ public class AudiotaggerPlugin implements MethodCallHandler {
             Util.setFieldIfExist(newTag, FieldKey.ALBUM_ARTIST, map, "albumArtist");
             Util.setFieldIfExist(newTag, FieldKey.YEAR, map, "year");
 
-            if (artwork != null) {
-                Artwork cover = ArtworkFactory.getNew();
-                cover.setBinaryData(artwork);
-                newTag.setField(cover);
-            }
+            Artwork cover = null;
+            if (artwork != null && artwork.trim().length()>0 ) {
 
+                if(artwork.startsWith("http://")||artwork.startsWith("https://")){
+                    cover = ArtworkFactory.createLinkedArtworkFromURL(artwork);
+                }else {
+                    // dui下面的内容做特殊处理
+                    cover = ArtworkFactory.createArtworkFromFile(new File(artwork));
+
+                    if(newTag instanceof Mp4Tag){
+                        RandomAccessFile imageFile = new RandomAccessFile(new File(artwork),"r");
+                        byte[] imageData = new byte[(int)imageFile.length()];
+                        imageFile.read(imageData);
+                        newTag.setField(((Mp4Tag) newTag).createArtworkField(imageData));
+                    }
+
+                    if(newTag instanceof FlacTag){
+                        RandomAccessFile imageFile = new RandomAccessFile(new File(artwork), "r");
+                        byte[] imageData = new byte[(int) imageFile.length()];
+                        imageFile.read(imageData);
+                        newTag.setField(((FlacTag) newTag).createArtworkField(imageData,
+                                PictureTypes.DEFAULT_ID,
+                                ImageFormats.MIME_TYPE_JPEG,
+                                "test",
+                                0,
+                                0,
+                                24,
+                                0));
+                    }
+
+                    if (newTag instanceof VorbisCommentTag){
+                        RandomAccessFile imageFile = new RandomAccessFile(new File(artwork),"r");
+                        byte[] imageData = new byte[(int)imageFile.length()];
+                        imageFile.read(imageData);
+                        char[] base64Data = Base64Coder.encode(imageData);
+                        String base64image = new String(base64Data);
+                        newTag.setField(((VorbisCommentTag) newTag).createField(VorbisCommentFieldKey.COVERART,base64image));
+                        newTag.setField(((VorbisCommentTag) newTag).createField(VorbisCommentFieldKey.COVERARTMIME,"image/png"));
+                    }
+                }
+
+                if(newTag instanceof ID3v1Tag||newTag instanceof ID3v24Tag){
+                    newTag.setField(cover);
+                }
+            }
             audioFile.commit();
 
             String[] urls = {path};
