@@ -208,7 +208,7 @@ public class AudiotaggerPlugin implements MethodCallHandler {
     static class Util {
         @SuppressLint("NewApi")
         static void setFieldIfExist(Tag tag, FieldKey field, Map<String, String> map, String key) throws FieldDataInvalidException {
-            String value = map.getOrDefault(key, "");
+            String value = map.get(key);
             if (value != null && !value.equals("")) {
                 tag.setField(field, value);
             }
