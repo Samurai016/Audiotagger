@@ -11,8 +11,6 @@ import org.jaudiotagger.tag.FieldDataInvalidException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.flac.FlacTag;
-import org.jaudiotagger.tag.id3.ID3v1Tag;
-import org.jaudiotagger.tag.id3.ID3v24Tag;
 import org.jaudiotagger.tag.id3.valuepair.ImageFormats;
 import org.jaudiotagger.tag.images.Artwork;
 import org.jaudiotagger.tag.images.ArtworkFactory;
@@ -25,6 +23,7 @@ import org.jaudiotagger.tag.vorbiscomment.util.Base64Coder;
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.util.HashMap;
+import java.util.Map;
 
 import io.flutter.Log;
 import io.flutter.plugin.common.MethodCall;
@@ -60,7 +59,7 @@ public class AudiotaggerPlugin implements MethodCallHandler {
             case "writeTags":
                 if (call.hasArgument("path") && call.hasArgument("tags") && call.hasArgument("artwork")) {
                     String path = call.argument("path");
-                    HashMap<String, String> map = call.argument("tags");
+                    Map<String, String> map = call.argument("tags");
                     String artwork = call.argument("artwork");
                     result.success(writeTags(path, map, artwork));
                 } else
@@ -83,7 +82,7 @@ public class AudiotaggerPlugin implements MethodCallHandler {
         }
     }
 
-    private boolean writeTags(String path, HashMap<String, String> map, String artwork) {
+    private boolean writeTags(String path, Map<String, String> map, String artwork) {
         try {
             File mp3File = new File(path);
             AudioFile audioFile = AudioFileIO.read(mp3File);
@@ -165,13 +164,13 @@ public class AudiotaggerPlugin implements MethodCallHandler {
     }
 
     @SuppressLint("NewApi")
-    private HashMap<String, String> readTags(String path) {
+    private Map<String, String> readTags(String path) {
         try {
             File mp3File = new File(path);
             AudioFile audioFile = AudioFileIO.read(mp3File);
 
             Tag tag = audioFile.getTag();
-            HashMap<String, String> map = new HashMap<>();
+            Map<String, String> map = new HashMap<>();
 
             map.put("title", tag.getFirst(FieldKey.TITLE));
             map.put("artist", tag.getFirst(FieldKey.ARTIST));
@@ -208,9 +207,9 @@ public class AudiotaggerPlugin implements MethodCallHandler {
 
     static class Util {
         @SuppressLint("NewApi")
-        static void setFieldIfExist(Tag tag, FieldKey field, HashMap<String, String> map, String key) throws FieldDataInvalidException {
+        static void setFieldIfExist(Tag tag, FieldKey field, Map<String, String> map, String key) throws FieldDataInvalidException {
             String value = map.getOrDefault(key, "");
-            if (value != null && !value.equals("")) {
+            if (value != null) {
                 tag.setField(field, value);
             }
         }

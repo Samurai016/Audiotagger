@@ -13,7 +13,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final filePath = "/storage/emulated/0/五音/音乐/李荣浩 - 麻雀.mp3";
+  final filePath = "/storage/emulated/0/五音/音乐/程响 - 世界这么大还是遇见你.mp3";
   Widget result;
   Audiotagger tagger = new Audiotagger();
 
@@ -24,7 +24,7 @@ class _MyAppState extends State<MyApp> {
       artist: "李荣浩",
       album: "album",
       year: "2019",
-      artwork: artwork,
+//      artwork: artwork,
     );
 
     final output = await tagger.writeTags(
