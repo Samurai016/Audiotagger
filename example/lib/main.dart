@@ -1,10 +1,9 @@
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:flutter/material.dart';
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:audiotagger/audiotagger.dart';
+import 'package:audiotagger/models/tag.dart';
+import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
 
@@ -14,31 +13,28 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final filePath = "/storage/emulated/0/Music/test.webm";
+  final filePath = "/storage/sdcard0/五音/音乐/1.mp3";
   Widget result;
   Audiotagger tagger = new Audiotagger();
 
   Future _writeTags() async {
-    final tags = <String, String>{
-      "title": "Ciao belli",
-      "artist": "Non lo so",
-      "album": "Canzone bella",
-      "year": "1973",
-    };
+    String artwork = "/storage/emulated/0/五音/cover.jpg";
+    Tag tags = Tag(
+      title: "麻雀",
+      artist: "李荣浩",
+      album: "album",
+      year: "2019",
+//      artwork: artwork,
+    );
 
-    // final artworkPath = "/storage/emulated/0/Music/artwork.jpg";
-    // final artworkFile = new File(artworkPath);
-    // final artwork = await artworkFile.readAsBytes();
-
-    final output = await tagger.writeTagsFromMap(
+    final output = await tagger.writeTags(
       path: filePath,
-      tags: tags,
-      //artwork: artwork,
+      tag: tags,
       checkPermission: true,
     );
 
     setState(() {
-     result = Text(output.toString()); 
+      result = Text(output.toString());
     });
   }
 
@@ -46,9 +42,9 @@ class _MyAppState extends State<MyApp> {
     final output = await tagger.readTagsAsMap(
       path: filePath,
       checkPermission: true,
-    );  
+    );
     setState(() {
-     result = Text(jsonEncode(output)); 
+      result = Text(jsonEncode(output));
     });
   }
 
@@ -56,9 +52,9 @@ class _MyAppState extends State<MyApp> {
     final output = await tagger.readArtwork(
       path: filePath,
       checkPermission: true,
-    );  
+    );
     setState(() {
-     result = Image.memory(output); 
+      result = Image.memory(output);
     });
   }
 

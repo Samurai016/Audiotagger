@@ -38,16 +38,14 @@ class Audiotagger {
     @required String path,
     @required Map tags,
     bool checkPermission = false,
-    Version version = Version.ID3V2,
-    List<int> artwork,
+    String artwork,
   }) async {
     if (checkPermission) await _checkPermissions();
 
     return await _channel.invokeMethod("writeTags", {
       "path": path,
       "tags": tags,
-      "artwork": artwork != null ? Uint8List.fromList(artwork) : null,
-      "version": version.index,
+      "artwork": artwork,
     });
   }
 
@@ -70,7 +68,6 @@ class Audiotagger {
     @required String path,
     @required Tag tag,
     bool checkPermission = false,
-    Version version = Version.ID3V2,
   }) async {
     if (checkPermission) await _checkPermissions();
 
@@ -78,7 +75,6 @@ class Audiotagger {
       "path": path,
       "tags": tag.toMap(),
       "artwork": tag.artwork,
-      "version": version.index,
     });
   }
 
@@ -148,9 +144,4 @@ class Audiotagger {
       await PermissionHandler().requestPermissions([PermissionGroup.storage]);
     }
   }
-}
-
-enum Version {
-  ID3V1,
-  ID3V2,
 }
