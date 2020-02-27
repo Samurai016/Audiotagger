@@ -12,19 +12,20 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => _MyAppState();
 }
 
+
 class _MyAppState extends State<MyApp> {
-  final filePath = "/storage/sdcard0/五音/音乐/1.mp3";
+  final filePath = "/storage/emulated/0/Download/Diodato - Fai Rumore.mp3";
   Widget result;
   Audiotagger tagger = new Audiotagger();
 
   Future _writeTags() async {
-    String artwork = "/storage/emulated/0/五音/cover.jpg";
+    String artwork = "/storage/emulated/0/Download/cover.png";
     Tag tags = Tag(
-      title: "麻雀",
-      artist: "李荣浩",
+      title: "Title of the song",
+      artist: "A fake artist",
       album: "album",
-      year: "2019",
-//      artwork: artwork,
+      year: "2020",
+      artwork: artwork,
     );
 
     final output = await tagger.writeTags(
@@ -54,7 +55,7 @@ class _MyAppState extends State<MyApp> {
       checkPermission: true,
     );
     setState(() {
-      result = Image.memory(output);
+      result = output!=null ? Image.memory(output) : Text("No artwork found");
     });
   }
 
@@ -63,7 +64,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text('Audiotagger example app'),
         ),
         body: Center(
           child: Column(

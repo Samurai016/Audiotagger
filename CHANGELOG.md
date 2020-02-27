@@ -10,3 +10,7 @@
 ## 1.0.3
 
 * Increased performance.
+
+## 1.0.4
+
+* Solved bug of [issue #1](https://github.com/Samurai016/Audiotagger/issues/1).
