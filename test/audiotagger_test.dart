@@ -103,7 +103,7 @@ void main() {
 
       final path = "storage/emulated/0/Music/test.mp3";
       final pathToImage = "storage/emulated/0/image.jpg";
-      
+
       final file = new File(pathToImage);
       final artwork = Uint8List.fromList(await file.readAsBytes());
 

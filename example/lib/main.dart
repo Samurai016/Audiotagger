@@ -12,7 +12,6 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => _MyAppState();
 }
 
-
 class _MyAppState extends State<MyApp> {
   final filePath = "/storage/emulated/0/Download/Diodato - Fai Rumore.mp3";
   Widget result;
@@ -55,7 +54,7 @@ class _MyAppState extends State<MyApp> {
       checkPermission: true,
     );
     setState(() {
-      result = output!=null ? Image.memory(output) : Text("No artwork found");
+      result = output != null ? Image.memory(output) : Text("No artwork found");
     });
   }
 
