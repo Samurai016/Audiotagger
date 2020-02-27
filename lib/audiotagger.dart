@@ -25,7 +25,7 @@ class Audiotagger {
   ///
   /// [tags]: A map of the tags.
   ///
-  /// [artwork]: An array of bytes which represent the song artwork.
+  /// [artwork]: The file path of the song artwork.
   ///
   /// [checkPermission]: If setted to true,
   /// the tagger will check for storage read and write before before
@@ -55,7 +55,7 @@ class Audiotagger {
   ///
   /// [tags]: A tag object.
   ///
-  /// [artwork]: An array of bytes which represent the song artwork.
+  /// [artwork]: The file path of the song artwork.
   ///
   /// [checkPermission]: If setted to true,
   /// the tagger will check for storage read and write before before

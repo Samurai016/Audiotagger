@@ -13,7 +13,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final filePath = "/storage/emulated/0/Download/Diodato - Fai Rumore.mp3";
+  final filePath = "/storage/emulated/0/Download/test.mp3";
   Widget result;
   Audiotagger tagger = new Audiotagger();
 
@@ -22,7 +22,7 @@ class _MyAppState extends State<MyApp> {
     Tag tags = Tag(
       title: "Title of the song",
       artist: "A fake artist",
-      album: "album",
+      album: "A fake album",
       year: "2020",
       artwork: artwork,
     );

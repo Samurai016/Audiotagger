@@ -58,7 +58,7 @@ class Tag {
       "album": album,
       "albumArtist": albumArtist,
       "year": year,
-      "String": artwork,
+      "artwork": artwork,
     };
   }
 }

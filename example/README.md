@@ -1,4 +1,4 @@
-# audiotagger_example
+# Audiotagger example
 
 Demonstrates how to use the audiotagger plugin.
 

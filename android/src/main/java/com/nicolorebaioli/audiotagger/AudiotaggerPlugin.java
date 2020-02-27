@@ -105,10 +105,10 @@ public class AudiotaggerPlugin implements MethodCallHandler {
             Artwork cover = null;
             if (artwork != null && artwork.trim().length() > 0) {
 
-                // 删除已有的专辑封面
+                // Delete existing album art
                 newTag.deleteArtworkField();
 
-                // dui下面的内容做特殊处理
+                // The following content is treated specially
                 cover = ArtworkFactory.createArtworkFromFile(new File(artwork));
 
                 if (newTag instanceof Mp4Tag) {
@@ -123,7 +123,7 @@ public class AudiotaggerPlugin implements MethodCallHandler {
                     newTag.setField(((FlacTag) newTag).createArtworkField(imageData,
                             PictureTypes.DEFAULT_ID,
                             ImageFormats.MIME_TYPE_JPEG,
-                            "test",
+                            "artwork",
                             0,
                             0,
                             24,

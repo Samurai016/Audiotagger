@@ -9,7 +9,7 @@ This library allow yoy to read and write ID3 tags to MP3 files.
 ## Add dependency
 ```yaml
 dependencies:
-  audiotagger: ^1.0.4
+  audiotagger: ^1.0.5
 ```
 Audiotagger need accesso to read and write storage. To do this, add this lines in your `AndroidManifest.xml` (inside `manifest` tag, see [example manifest](./example/android/app/src/main/AndroidManifest.xml#L4) to check).
 ```xml
@@ -96,9 +96,9 @@ You can write the ID3 tags from a `Map`.
 void setTagsFromMap() async {
     final path = "storage/emulated/0/Music/test.mp3";
     final tags = <String, String>{
-        "title": "Viva la vita",
-        "artist": "Renato Pozzetto",
-        "album": "Viva la vita - album",
+        "title": "Title of the song",
+        "artist": "A fake artist",
+        "album": "A fake album",
     };
 
     final result = await tagger.writeTagsFromMap(
@@ -117,9 +117,9 @@ You can write the ID3 tags from a `Tag` object.
 void setTags() async {
     final path = "storage/emulated/0/Music/test.mp3";
     final tags = <String, String>{
-        "title": "Viva la vita",
-        "artist": "Renato Pozzetto",
-        "album": "Viva la vita - album",
+        "title": "Title of the song",
+        "artist": "A fake artist",
+        "album": "A fake album",
     };
     final tag = Tag.fromMap(tags);
 
@@ -169,7 +169,7 @@ These are the schemes of the `Map` asked and returned by Audiotagger and of the 
     String album;
     String albumArtist;
     String year;
-    Uint8List artwork;
+    String artwork; // It represents the file path of the song artwork.
 ```
 
 ## Copyright and license

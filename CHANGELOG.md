@@ -14,3 +14,7 @@
 ## 1.0.4
 
 * Solved bug of [issue #1](https://github.com/Samurai016/Audiotagger/issues/1).
+
+## 1.0.5
+
+* Updated documentation.
