@@ -42,6 +42,7 @@ class Tag {
     album = map["album"];
     albumArtist = map["albumArtist"];
     year = map["year"];
+    artwork = map["artwork"];
   }
 
   Map<String, String> toMap() {

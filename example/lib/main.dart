@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:audiotagger/audiotagger.dart';
 import 'package:audiotagger/models/tag.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() => runApp(MyApp());
 
@@ -17,8 +18,19 @@ class _MyAppState extends State<MyApp> {
   Widget result;
   Audiotagger tagger = new Audiotagger();
 
+  @override
+  void initState() {
+    super.initState();
+    _checkPermissions();
+  }
+  Future _checkPermissions() async {
+    if (!await Permission.storage.request().isGranted) {
+      await _checkPermissions();
+    }
+  }
+
   Future _writeTags() async {
-    String artwork = "/storage/emulated/0/Download/cover.png";
+    String artwork = "/storage/emulated/0/Download/cover.jpg";
     Tag tags = Tag(
       title: "Title of the song",
       artist: "A fake artist",
@@ -30,7 +42,6 @@ class _MyAppState extends State<MyApp> {
     final output = await tagger.writeTags(
       path: filePath,
       tag: tags,
-      checkPermission: true,
     );
 
     setState(() {
@@ -41,7 +52,6 @@ class _MyAppState extends State<MyApp> {
   Future _readTags() async {
     final output = await tagger.readTagsAsMap(
       path: filePath,
-      checkPermission: true,
     );
     setState(() {
       result = Text(jsonEncode(output));
@@ -51,7 +61,6 @@ class _MyAppState extends State<MyApp> {
   Future _readArtwork() async {
     final output = await tagger.readArtwork(
       path: filePath,
-      checkPermission: true,
     );
     setState(() {
       result = output != null ? Image.memory(output) : Text("No artwork found");

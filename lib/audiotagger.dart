@@ -3,7 +3,6 @@ import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 import 'models/tag.dart';
 
@@ -27,21 +26,14 @@ class Audiotagger {
   ///
   /// [artwork]: The file path of the song artwork.
   ///
-  /// [checkPermission]: If setted to true,
-  /// the tagger will check for storage read and write before before
-  /// to start writing. By default set to false.
-  ///
   /// [version]: The version of ID3 tag frame you want to write.  By default set to ID3V2.
   ///
   /// [return]: `true` if the operation has success, `false` instead.
   Future<bool> writeTagsFromMap({
     @required String path,
     @required Map tags,
-    bool checkPermission = false,
     String artwork,
   }) async {
-    if (checkPermission) await _checkPermissions();
-
     return await _channel.invokeMethod("writeTags", {
       "path": path,
       "tags": tags,
@@ -57,20 +49,13 @@ class Audiotagger {
   ///
   /// [artwork]: The file path of the song artwork.
   ///
-  /// [checkPermission]: If setted to true,
-  /// the tagger will check for storage read and write before before
-  /// to start writing. By default set to false.
-  ///
   /// [version]: The version of ID3 tag frame you want to write.  By default set to ID3V2.
   ///
   /// [return]: `true` if the operation has success, `false` instead.
   Future<bool> writeTags({
     @required String path,
     @required Tag tag,
-    bool checkPermission = false,
   }) async {
-    if (checkPermission) await _checkPermissions();
-
     return await _channel.invokeMethod("writeTags", {
       "path": path,
       "tags": tag.toMap(),
@@ -78,21 +63,39 @@ class Audiotagger {
     });
   }
 
+  /// Method to write ID3 tags to MP3 file.
+  ///
+  /// [path]: The path of the file.
+  ///
+  /// [tagField]: The name of the field you want to change (refer to documentation for their name, section "Map of tags").
+  ///
+  /// [value]: Value of the field.
+  ///
+  /// [artwork]: The file path of the song artwork.
+  ///
+  /// [version]: The version of ID3 tag frame you want to write.  By default set to ID3V2.
+  ///
+  /// [return]: `true` if the operation has success, `false` instead.
+  Future<bool> writeTag({
+    @required String path,
+    @required String tagField,
+    @required String value,
+  }) async {
+    return await _channel.invokeMethod("writeTags", {
+      "path": path,
+      "tags": tagField!="artwork" ? <String, String>{ tagField: value } : null,
+      "artwork": tagField=="artwork" ? value : null,
+    });
+  }
+
   /// Method to read ID3 tags from MP3 file.
   ///
   /// [path]: The path of the file.
   ///
-  /// [checkPermission]: If setted to true,
-  /// the tagger will check for storage read and write before before
-  /// to start writing. By default set to false.
-  ///
   /// [return]: A map of the tags
   Future<Map> readTagsAsMap({
     @required String path,
-    bool checkPermission = false,
   }) async {
-    if (checkPermission) await _checkPermissions();
-
     return await _channel.invokeMethod("readTags", {
       "path": path,
     });
@@ -102,18 +105,12 @@ class Audiotagger {
   ///
   /// [path]: The path of the file.
   ///
-  /// [checkPermission]: If setted to true,
-  /// the tagger will check for storage read and write before before
-  /// to start writing. By default set to false.
-  ///
   /// [return]: A tag object of the ID3 tags of the song;
   Future<Tag> readTags({
     @required String path,
-    bool checkPermission = false,
   }) async {
     return Tag.fromMap(await readTagsAsMap(
       path: path,
-      checkPermission: checkPermission,
     ));
   }
 
@@ -121,27 +118,12 @@ class Audiotagger {
   ///
   /// [path]: The path of the file.
   ///
-  /// [checkPermission]: If setted to true,
-  /// the tagger will check for storage read and write before before
-  /// to start writing. By default set to false.
-  ///
   /// [return]: A byte array representation of the image.
   Future<Uint8List> readArtwork({
     @required String path,
-    bool checkPermission = false,
   }) async {
-    if (checkPermission) await _checkPermissions();
-
     return await _channel.invokeMethod("readArtwork", {
       "path": path,
     });
-  }
-
-  Future _checkPermissions() async {
-    var isChecked = await PermissionHandler()
-        .checkPermissionStatus(PermissionGroup.storage);
-    if (isChecked != PermissionStatus.granted) {
-      await PermissionHandler().requestPermissions([PermissionGroup.storage]);
-    }
   }
 }

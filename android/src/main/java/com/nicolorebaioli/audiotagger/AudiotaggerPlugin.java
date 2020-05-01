@@ -103,42 +103,48 @@ public class AudiotaggerPlugin implements MethodCallHandler {
             Util.setFieldIfExist(newTag, FieldKey.YEAR, map, "year");
 
             Artwork cover = null;
-            if (artwork != null && artwork.trim().length() > 0) {
+            // If field is null, it is ignored
+            if (artwork != null) {
+                // If field is set to an empty string, the field is deleted, otherwise it is set
+                if (artwork.trim().length() > 0) {
 
-                // Delete existing album art
-                newTag.deleteArtworkField();
+                    // Delete existing album art
+                    newTag.deleteArtworkField();
 
-                // The following content is treated specially
-                cover = ArtworkFactory.createArtworkFromFile(new File(artwork));
-
-                if (newTag instanceof Mp4Tag) {
-                    RandomAccessFile imageFile = new RandomAccessFile(new File(artwork), "r");
-                    byte[] imageData = new byte[(int) imageFile.length()];
-                    imageFile.read(imageData);
-                    newTag.setField(((Mp4Tag) newTag).createArtworkField(imageData));
-                }else if (newTag instanceof FlacTag) {
-                    RandomAccessFile imageFile = new RandomAccessFile(new File(artwork), "r");
-                    byte[] imageData = new byte[(int) imageFile.length()];
-                    imageFile.read(imageData);
-                    newTag.setField(((FlacTag) newTag).createArtworkField(imageData,
-                            PictureTypes.DEFAULT_ID,
-                            ImageFormats.MIME_TYPE_JPEG,
-                            "artwork",
-                            0,
-                            0,
-                            24,
-                            0));
-                }else if (newTag instanceof VorbisCommentTag) {
-                    RandomAccessFile imageFile = new RandomAccessFile(new File(artwork), "r");
-                    byte[] imageData = new byte[(int) imageFile.length()];
-                    imageFile.read(imageData);
-                    char[] base64Data = Base64Coder.encode(imageData);
-                    String base64image = new String(base64Data);
-                    newTag.setField(((VorbisCommentTag) newTag).createField(VorbisCommentFieldKey.COVERART, base64image));
-                    newTag.setField(((VorbisCommentTag) newTag).createField(VorbisCommentFieldKey.COVERARTMIME, "image/png"));
-                }else {
+                    // The following content is treated specially
                     cover = ArtworkFactory.createArtworkFromFile(new File(artwork));
-                    newTag.setField(cover);
+
+                    if (newTag instanceof Mp4Tag) {
+                        RandomAccessFile imageFile = new RandomAccessFile(new File(artwork), "r");
+                        byte[] imageData = new byte[(int) imageFile.length()];
+                        imageFile.read(imageData);
+                        newTag.setField(((Mp4Tag) newTag).createArtworkField(imageData));
+                    }else if (newTag instanceof FlacTag) {
+                        RandomAccessFile imageFile = new RandomAccessFile(new File(artwork), "r");
+                        byte[] imageData = new byte[(int) imageFile.length()];
+                        imageFile.read(imageData);
+                        newTag.setField(((FlacTag) newTag).createArtworkField(imageData,
+                                PictureTypes.DEFAULT_ID,
+                                ImageFormats.MIME_TYPE_JPEG,
+                                "artwork",
+                                0,
+                                0,
+                                24,
+                                0));
+                    }else if (newTag instanceof VorbisCommentTag) {
+                        RandomAccessFile imageFile = new RandomAccessFile(new File(artwork), "r");
+                        byte[] imageData = new byte[(int) imageFile.length()];
+                        imageFile.read(imageData);
+                        char[] base64Data = Base64Coder.encode(imageData);
+                        String base64image = new String(base64Data);
+                        newTag.setField(((VorbisCommentTag) newTag).createField(VorbisCommentFieldKey.COVERART, base64image));
+                        newTag.setField(((VorbisCommentTag) newTag).createField(VorbisCommentFieldKey.COVERARTMIME, "image/png"));
+                    }else {
+                        cover = ArtworkFactory.createArtworkFromFile(new File(artwork));
+                        newTag.setField(cover);
+                    }
+                } else {
+                    newTag.deleteArtworkField();
                 }
             }
             audioFile.commit();
@@ -152,7 +158,7 @@ public class AudiotaggerPlugin implements MethodCallHandler {
                     new MediaScannerConnection.OnScanCompletedListener() {
                         @Override
                         public void onScanCompleted(String path, Uri uri) {
-                            Log.i("SCANNING", "Success");
+                            Log.i("Audiotagger", "Media scanning success");
                         }
                     }
             );
@@ -209,8 +215,14 @@ public class AudiotaggerPlugin implements MethodCallHandler {
         @SuppressLint("NewApi")
         static void setFieldIfExist(Tag tag, FieldKey field, Map<String, String> map, String key) throws FieldDataInvalidException {
             String value = map.get(key);
-            if (value != null && !value.equals("")) {
-                tag.setField(field, value);
+            // If field is null, it is ignored
+            if (value != null) {
+                // If field is set to an empty string, the field is deleted, otherwise it is set
+                if (value.trim().length() > 0) {
+                    tag.setField(field, value);
+                } else {
+                    tag.deleteField(field);
+                }
             }
         }
 

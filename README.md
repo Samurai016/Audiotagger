@@ -2,21 +2,17 @@
 ![build status](https://img.shields.io/badge/build-passing-brightgreen?style=flat-square)
 [![pub](https://img.shields.io/pub/v/audiotagger?style=flat-square)](https://pub.dev/packages/audiotagger)
 
-This library allow yoy to read and write ID3 tags to MP3 files.
+This library allow you to read and write ID3 tags to MP3 files.
 
 > **Library actually works only on Android.**
 
 ## Add dependency
 ```yaml
 dependencies:
-  audiotagger: ^1.0.5
+  audiotagger: ^1.1.0
 ```
-Audiotagger need accesso to read and write storage. To do this, add this lines in your `AndroidManifest.xml` (inside `manifest` tag, see [example manifest](./example/android/app/src/main/AndroidManifest.xml#L4) to check).
-```xml
-<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-```
-Than you can use you preferred way to request them or simply set `checkPermission` flag to `true`.
+Audiotagger need access to read and write storage.  \
+To do this you can use [Permission Handler library](https://pub.dev/packages/permission_handler).
 
 ## Table of contents
 - [Basic usage](#basic-usage-for-any-operation)
@@ -27,6 +23,7 @@ Than you can use you preferred way to request them or simply set `checkPermissio
 - [Writing operations](#writing-operations)
     - [Write tags from `Map`](#write-tags-from-map)
     - [Write tags from `Tag` object](#write-tags-from-tag-object)
+    - [Write single tag field](#write-single-tag-field)
 - [Models](#models)
     - [`Map` of tags](#map-of-tag)
     - [`Tag` class](#tag-class)
@@ -38,9 +35,6 @@ Initialize a new instance of the tagger;
 final tagger = new Audiotagger();
 ```
 
-Any operation has a `checkPermission` boolean parameter. By setting it to `true`, 
-the tagger will check for storage read and write permission, before to start the operations.
-
 ## Reading operations
 
 ### Read tags as map
@@ -49,8 +43,7 @@ You can get a `Map` of the ID3 tags.
 void getTagsAsMap() async {
     final String filePath = "/storage/emulated/0/file.mp3";
     final Map map = await tagger.readTagsAsMap(
-        path: filePath,
-        checkPermission: true,
+        path: filePath
     );
 }
 ```
@@ -64,8 +57,7 @@ You can get a `Tag` object of the ID3 tags.
 void getTags() async {
     final String filePath = "/storage/emulated/0/file.mp3";
     final Tag tag = await tagger.readTags(
-        path: filePath,
-        checkPermission: true,
+        path: filePath
     );
 }
 ```
@@ -80,8 +72,7 @@ To get the artwork of the song, use this method.
 void getArtwork() async {
     final String filePath = "/storage/emulated/0/file.mp3";
     final Uint8List bytes = await tagger.readArtwork(
-        path: filePath,
-        checkPermission: true,
+        path: filePath
     );
 }
 ```
@@ -91,20 +82,23 @@ It return a `Uint8List` of the bytes of the artwork.
 ## Writing operations
 
 ### Write tags from map
-You can write the ID3 tags from a `Map`.
+You can write the ID3 tags from a `Map`.  \
+To reset a field, pass an empty string (`""`).  \
+If the value is `null`, the field will be ignored and it will not be written.
+
 ```dart
 void setTagsFromMap() async {
     final path = "storage/emulated/0/Music/test.mp3";
     final tags = <String, String>{
         "title": "Title of the song",
         "artist": "A fake artist",
-        "album": "A fake album",
+        "album": "",    //This field will be reset
+        "genre": null,  //This field will not be written
     };
 
     final result = await tagger.writeTagsFromMap(
         path: path,
-        tags: tags,
-        checkPermission: true,
+        tags: tags
     );
 }
 ```
@@ -112,26 +106,47 @@ void setTagsFromMap() async {
 The map has this schema:[Tag schema](#map-of-tags).
 
 ### Write tags from `Tag` object
-You can write the ID3 tags from a `Tag` object.
+You can write the ID3 tags from a `Tag` object.  \
+To reset a field, pass an empty string (`""`).  \
+If the value is `null`, the field will be ignored and it will not be written.
+
 ```dart
 void setTags() async {
     final path = "storage/emulated/0/Music/test.mp3";
-    final tags = <String, String>{
-        "title": "Title of the song",
-        "artist": "A fake artist",
-        "album": "A fake album",
-    };
-    final tag = Tag.fromMap(tags);
+    final tag = Tag(
+        title: "Title of the song",
+        artist: "A fake artist",
+        album: "",    //This field will be reset
+        genre: null,  //This field will not be written
+    );
 
     final result = await tagger.writeTags(
         path: path,
         tag: tag,
-        checkPermission: true,
     );
 }
 ```
 
 The `Tag` object has this schema: [Tag schema](#tag-class).
+
+### Write single tag field
+You can write a single tag field by specifying the field name.  \
+To reset the field, pass an empty string (`""`).  \
+If the value is `null`, the field will be ignored and it will not be written.  \
+
+```dart
+void setTags() async {
+    final path = "storage/emulated/0/Music/test.mp3";
+
+    final result = await tagger.writeTag(
+        path: path,
+        tagField: "title",
+        value: "Title of the song"
+    );
+}
+```
+
+Refer to [map of tags](#map-of-tag) for fields name.
 
 ## Models
 
@@ -152,6 +167,7 @@ These are the schemes of the `Map` asked and returned by Audiotagger and of the 
     "album": value,
     "albumArtist": value,
     "year": value,
+    "artwork": value, // Null if obtained from readTags or readTagsAsMap
 };
 ```
 

@@ -25,15 +25,15 @@ void main() {
 
       final path = "storage/emulated/0/Music/test.mp3";
       final tags = <String, String>{
-        "title": "Viva la vita",
-        "artist": "Renato Pozzetto",
-        "album": "Viva la vita - album",
+        "title": "Title of the song",
+        "artist": "A fake artist",
+        "album": "A fake album",
+        "year": "2020",
       };
 
       final result = await tagger.writeTagsFromMap(
         path: path,
         tags: tags,
-        checkPermission: true,
       );
 
       expect(result, true);
@@ -44,16 +44,16 @@ void main() {
 
       final path = "storage/emulated/0/Music/test.mp3";
       final tags = <String, String>{
-        "title": "Viva la vita",
-        "artist": "Renato Pozzetto",
-        "album": "Viva la vita - album",
+        "title": "Title of the song",
+        "artist": "A fake artist",
+        "album": "A fake album",
+        "year": "2020",
       };
       final tag = Tag.fromMap(tags);
 
       final result = await tagger.writeTags(
         path: path,
         tag: tag,
-        checkPermission: true,
       );
 
       expect(result, true);
@@ -66,14 +66,14 @@ void main() {
 
       final path = "storage/emulated/0/Music/test.mp3";
       final tags = <String, String>{
-        "title": "Viva la vita",
-        "artist": "Renato Pozzetto",
-        "album": "Viva la vita - album",
+        "title": "Title of the song",
+        "artist": "A fake artist",
+        "album": "A fake album",
+        "year": "2020",
       };
 
       final result = await tagger.readTagsAsMap(
         path: path,
-        checkPermission: true,
       );
 
       expect(result, tags);
@@ -84,15 +84,15 @@ void main() {
 
       final path = "storage/emulated/0/Music/test.mp3";
       final tags = <String, String>{
-        "title": "Viva la vita",
-        "artist": "Renato Pozzetto",
-        "album": "Viva la vita - album",
+        "title": "Title of the song",
+        "artist": "A fake artist",
+        "album": "A fake album",
+        "year": "2020",
       };
       final tag = Tag.fromMap(tags);
 
       final result = await tagger.readTags(
         path: path,
-        checkPermission: true,
       );
 
       expect(result, tag);
@@ -109,7 +109,6 @@ void main() {
 
       final result = await tagger.readArtwork(
         path: path,
-        checkPermission: true,
       );
 
       expect(result, artwork);

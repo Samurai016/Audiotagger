@@ -1,6 +1,6 @@
 name: audiotagger
 description: Library to read and write ID3 tags to MP3 files. You can get data as Map object or Tag object.
-version: 1.0.5
+version: 1.1.0
 homepage: https://github.com/Samurai016/Audiotagger
 
 environment:
@@ -10,9 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
-  permission_handler: ^4.0.0
-
+    
 dev_dependencies:
   flutter_test:
     sdk: flutter
