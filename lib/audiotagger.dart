@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'models/tag.dart';
@@ -12,7 +11,7 @@ import 'models/tag.dart';
 /// final tagger = new Audiotagger();
 /// ```
 class Audiotagger {
-  MethodChannel _channel;
+  late MethodChannel _channel;
 
   Audiotagger() {
     _channel = MethodChannel('audiotagger');
@@ -29,10 +28,10 @@ class Audiotagger {
   /// [version]: The version of ID3 tag frame you want to write.  By default set to ID3V2.
   ///
   /// [return]: `true` if the operation has success, `false` instead.
-  Future<bool> writeTagsFromMap({
-    @required String path,
-    @required Map tags,
-    String artwork,
+  Future<bool?> writeTagsFromMap({
+    required String path,
+    required Map tags,
+    String? artwork,
   }) async {
     return await _channel.invokeMethod("writeTags", {
       "path": path,
@@ -52,9 +51,9 @@ class Audiotagger {
   /// [version]: The version of ID3 tag frame you want to write.  By default set to ID3V2.
   ///
   /// [return]: `true` if the operation has success, `false` instead.
-  Future<bool> writeTags({
-    @required String path,
-    @required Tag tag,
+  Future<bool?> writeTags({
+    required String path,
+    required Tag tag,
   }) async {
     return await _channel.invokeMethod("writeTags", {
       "path": path,
@@ -76,15 +75,15 @@ class Audiotagger {
   /// [version]: The version of ID3 tag frame you want to write.  By default set to ID3V2.
   ///
   /// [return]: `true` if the operation has success, `false` instead.
-  Future<bool> writeTag({
-    @required String path,
-    @required String tagField,
-    @required String value,
+  Future<bool?> writeTag({
+    required String path,
+    required String tagField,
+    required String value,
   }) async {
     return await _channel.invokeMethod("writeTags", {
       "path": path,
-      "tags": tagField!="artwork" ? <String, String>{ tagField: value } : null,
-      "artwork": tagField=="artwork" ? value : null,
+      "tags": tagField != "artwork" ? <String, String>{tagField: value} : null,
+      "artwork": tagField == "artwork" ? value : null,
     });
   }
 
@@ -93,8 +92,8 @@ class Audiotagger {
   /// [path]: The path of the file.
   ///
   /// [return]: A map of the tags
-  Future<Map> readTagsAsMap({
-    @required String path,
+  Future<Map?> readTagsAsMap({
+    required String path,
   }) async {
     return await _channel.invokeMethod("readTags", {
       "path": path,
@@ -107,11 +106,11 @@ class Audiotagger {
   ///
   /// [return]: A tag object of the ID3 tags of the song;
   Future<Tag> readTags({
-    @required String path,
+    required String path,
   }) async {
-    return Tag.fromMap(await readTagsAsMap(
+    return Tag.fromMap(await (readTagsAsMap(
       path: path,
-    ));
+    ) as FutureOr<Map<dynamic, dynamic>>));
   }
 
   /// Method to read Artwork image from MP3 file.
@@ -119,8 +118,8 @@ class Audiotagger {
   /// [path]: The path of the file.
   ///
   /// [return]: A byte array representation of the image.
-  Future<Uint8List> readArtwork({
-    @required String path,
+  Future<Uint8List?> readArtwork({
+    required String path,
   }) async {
     return await _channel.invokeMethod("readArtwork", {
       "path": path,

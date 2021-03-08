@@ -1,17 +1,17 @@
 class Tag {
-  String title;
-  String artist;
-  String genre;
-  String trackNumber;
-  String trackTotal;
-  String discNumber;
-  String discTotal;
-  String lyrics;
-  String comment;
-  String album;
-  String albumArtist;
-  String year;
-  String artwork;
+  String? title;
+  String? artist;
+  String? genre;
+  String? trackNumber;
+  String? trackTotal;
+  String? discNumber;
+  String? discTotal;
+  String? lyrics;
+  String? comment;
+  String? album;
+  String? albumArtist;
+  String? year;
+  String? artwork;
 
   Tag({
     this.title,
@@ -45,8 +45,8 @@ class Tag {
     artwork = map["artwork"];
   }
 
-  Map<String, String> toMap() {
-    return <String, String>{
+  Map<String, String?> toMap() {
+    return <String, String?>{
       "title": title,
       "artist": artist,
       "genre": genre,

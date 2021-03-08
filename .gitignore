@@ -8,3 +8,6 @@
 *.lock
 
 build/
+
+.flutter-plugins-dependencies
+.flutter_export_environment.sh
