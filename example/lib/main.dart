@@ -23,6 +23,7 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     _checkPermissions();
   }
+
   Future _checkPermissions() async {
     if (!await Permission.storage.request().isGranted) {
       await _checkPermissions();
@@ -78,19 +79,19 @@ class _MyAppState extends State<MyApp> {
           child: Column(
             children: <Widget>[
               result != null ? result : Text("Ready.."),
-              RaisedButton(
+              ElevatedButton(
                 child: Text("Read tags"),
                 onPressed: () async {
                   await _readTags();
                 },
               ),
-              RaisedButton(
+              ElevatedButton(
                 child: Text("Read artwork"),
                 onPressed: () async {
                   await _readArtwork();
                 },
               ),
-              RaisedButton(
+              ElevatedButton(
                 child: Text("Write tags"),
                 onPressed: () async {
                   await _writeTags();
