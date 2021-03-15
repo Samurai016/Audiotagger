@@ -169,7 +169,7 @@ public class AudiotaggerPlugin implements MethodCallHandler {
         }
     }
 
-    @SuppressLint("NewApi")
+    //@SuppressLint("NewApi")
     private Map<String, String> readTags(String path) {
         try {
             File mp3File = new File(path);

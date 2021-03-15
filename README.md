@@ -9,7 +9,7 @@ This library allow you to read and write ID3 tags to MP3 files.
 ## Add dependency
 ```yaml
 dependencies:
-  audiotagger: ^1.1.0
+  audiotagger: ^2.0.0
 ```
 Audiotagger need access to read and write storage.  \
 To do this you can use [Permission Handler library](https://pub.dev/packages/permission_handler).

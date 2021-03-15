@@ -25,3 +25,7 @@
 * Added new method `writeTag` to write a single tag field.
 * Removed `checkPermission` flag. This will prevent problems of compatibility between Audiotagger and [Permission handler library](https://pub.dev/packages/permission_handler).
 Refer to README for any information. 
+
+## 2.0.0
+
+* Migrated project to support Null-Safety feature.
