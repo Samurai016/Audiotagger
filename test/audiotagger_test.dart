@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:audiotagger/models/tag.dart';
@@ -7,11 +6,39 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:audiotagger/audiotagger.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   const MethodChannel channel = MethodChannel('audiotagger');
 
   setUp(() {
     channel.setMockMethodCallHandler((MethodCall methodCall) async {
-      return '42';
+      final args = Map<String, dynamic>.from(methodCall.arguments);
+      switch (methodCall.method) {
+        case 'writeTags':
+          if (args.containsKey("path") &&
+              args.containsKey("tags") &&
+              args.containsKey("artwork")) {
+            return true;
+          } else {
+            throw new Exception('Missing parameter');
+          }
+        case 'readTags':
+          if (args.containsKey("path"))
+            return <String, String>{
+              "title": "Title of the song",
+              "artist": "A fake artist",
+              "album": "A fake album",
+              "year": "2020",
+            };
+          else
+            throw new Exception('Missing parameter');
+        case 'readArtwork':
+          if (args.containsKey("path"))
+            return Uint8List(2048);
+          else
+            throw new Exception('Missing parameter');
+        default:
+          throw new Exception('Method not implemented');
+      }
     });
   });
 
@@ -76,7 +103,7 @@ void main() {
         path: path,
       );
 
-      expect(result, tags);
+      expect(result!, tags);
     });
 
     test('readTags', () async {
@@ -95,23 +122,21 @@ void main() {
         path: path,
       );
 
-      expect(result, tag);
+      expect(result.toMap(), tag.toMap());
     });
 
     test('readArtwork', () async {
       final tagger = new Audiotagger();
 
       final path = "storage/emulated/0/Music/test.mp3";
-      final pathToImage = "storage/emulated/0/image.jpg";
 
-      final file = new File(pathToImage);
-      final artwork = Uint8List.fromList(await file.readAsBytes());
+      final artwork = Uint8List(2048); // Mocked artwork
 
       final result = await tagger.readArtwork(
         path: path,
       );
 
-      expect(result, artwork);
+      expect(result!, artwork);
     });
   });
 }

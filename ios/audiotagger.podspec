@@ -3,7 +3,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'audiotagger'
-  s.version          = '2.0.0'
+  s.version          = '2.1.0'
   s.summary          = 'Library to read and write ID3 tags to MP3 files. You can get data as Map object or Tag object.'
   s.description      = <<-DESC
   Library to read and write ID3 tags to MP3 files. You can get data as Map object or Tag object.

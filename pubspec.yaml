@@ -1,6 +1,6 @@
 name: audiotagger
 description: Library to read and write ID3 tags to MP3 files. You can get data as Map object or Tag object.
-version: 2.0.0
+version: 2.1.0
 homepage: https://github.com/Samurai016/Audiotagger
 
 environment:

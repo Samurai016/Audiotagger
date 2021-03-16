@@ -30,24 +30,42 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
+import io.flutter.plugin.common.BinaryMessenger;
+import io.flutter.embedding.engine.plugins.FlutterPlugin;
 
 /**
  * AudiotaggerPlugin
  */
-public class AudiotaggerPlugin implements MethodCallHandler {
+public class AudiotaggerPlugin implements MethodCallHandler, FlutterPlugin {
     /**
      * Plugin registration.
      */
     private Context context;
+    private MethodChannel channel;
 
-    private AudiotaggerPlugin(Context context) {
-        this.context = context;
+    /* Plugin registration */
+    @SuppressWarnings("deprecation")
+    public static void registerWith(io.flutter.plugin.common.PluginRegistry.Registrar registrar) {
+        final AudiotaggerPlugin instance = new AudiotaggerPlugin();
+        instance.onAttachedToEngine(registrar.context(), registrar.messenger());
     }
 
-    public static void registerWith(Registrar registrar) {
-        final MethodChannel channel = new MethodChannel(registrar.messenger(), "audiotagger");
-        channel.setMethodCallHandler(new AudiotaggerPlugin(registrar.context()));
+    @Override
+    public void onAttachedToEngine(FlutterPluginBinding binding) {
+        onAttachedToEngine(binding.getApplicationContext(), binding.getBinaryMessenger());
+    }
+
+    private void onAttachedToEngine(Context applicationContext, BinaryMessenger messenger) {
+        this.context = applicationContext;
+        this.channel = new MethodChannel(messenger, "audiotagger");
+        this.channel.setMethodCallHandler(this);
+    }
+
+    @Override
+    public void onDetachedFromEngine(FlutterPluginBinding binding) {
+        this.context = null;
+        this.channel.setMethodCallHandler(null);
+        this.channel = null;
     }
 
     @Override
@@ -88,6 +106,8 @@ public class AudiotaggerPlugin implements MethodCallHandler {
             AudioFile audioFile = AudioFileIO.read(mp3File);
 
             Tag newTag = audioFile.getTag();
+            if (newTag==null)
+                throw new Exception("File tag not found");
 
             Util.setFieldIfExist(newTag, FieldKey.TITLE, map, "title");
             Util.setFieldIfExist(newTag, FieldKey.ARTIST, map, "artist");
@@ -169,27 +189,28 @@ public class AudiotaggerPlugin implements MethodCallHandler {
         }
     }
 
-    //@SuppressLint("NewApi")
     private Map<String, String> readTags(String path) {
         try {
             File mp3File = new File(path);
             AudioFile audioFile = AudioFileIO.read(mp3File);
 
-            Tag tag = audioFile.getTag();
             Map<String, String> map = new HashMap<>();
+            Tag tag = audioFile.getTag();
 
-            map.put("title", tag.getFirst(FieldKey.TITLE));
-            map.put("artist", tag.getFirst(FieldKey.ARTIST));
-            map.put("genre", tag.getFirst(FieldKey.GENRE));
-            map.put("trackNumber", tag.getFirst(FieldKey.TRACK));
-            map.put("trackTotal", tag.getFirst(FieldKey.TRACK_TOTAL));
-            map.put("discNumber", tag.getFirst(FieldKey.DISC_NO));
-            map.put("discTotal", tag.getFirst(FieldKey.DISC_TOTAL));
-            map.put("lyrics", tag.getFirst(FieldKey.LYRICS));
-            map.put("comment", tag.getFirst(FieldKey.COMMENT));
-            map.put("album", tag.getFirst(FieldKey.ALBUM));
-            map.put("albumArtist", tag.getFirst(FieldKey.ALBUM_ARTIST));
-            map.put("year", tag.getFirst(FieldKey.YEAR));
+            if (tag != null) {
+                map.put("title", tag.getFirst(FieldKey.TITLE));
+                map.put("artist", tag.getFirst(FieldKey.ARTIST));
+                map.put("genre", tag.getFirst(FieldKey.GENRE));
+                map.put("trackNumber", tag.getFirst(FieldKey.TRACK));
+                map.put("trackTotal", tag.getFirst(FieldKey.TRACK_TOTAL));
+                map.put("discNumber", tag.getFirst(FieldKey.DISC_NO));
+                map.put("discTotal", tag.getFirst(FieldKey.DISC_TOTAL));
+                map.put("lyrics", tag.getFirst(FieldKey.LYRICS));
+                map.put("comment", tag.getFirst(FieldKey.COMMENT));
+                map.put("album", tag.getFirst(FieldKey.ALBUM));
+                map.put("albumArtist", tag.getFirst(FieldKey.ALBUM_ARTIST));
+                map.put("year", tag.getFirst(FieldKey.YEAR));
+            }
 
             return map;
         } catch (Exception e) {
@@ -202,7 +223,12 @@ public class AudiotaggerPlugin implements MethodCallHandler {
         try {
             File mp3File = new File(path);
             AudioFile audioFile = AudioFileIO.read(mp3File);
-            return audioFile.getTag().getFirstArtwork().getBinaryData();
+            Tag tag = audioFile.getTag();
+            if (tag != null) {
+                Artwork artwork = tag.getFirstArtwork();
+                if (artwork != null)
+                    return artwork.getBinaryData();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -212,7 +238,6 @@ public class AudiotaggerPlugin implements MethodCallHandler {
     enum Version {ID3V1, ID3V2}
 
     static class Util {
-        @SuppressLint("NewApi")
         static void setFieldIfExist(Tag tag, FieldKey field, Map<String, String> map, String key) throws FieldDataInvalidException {
             String value = map.get(key);
             // If field is null, it is ignored
@@ -225,6 +250,5 @@ public class AudiotaggerPlugin implements MethodCallHandler {
                 }
             }
         }
-
     }
 }

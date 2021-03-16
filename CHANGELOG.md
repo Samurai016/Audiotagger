@@ -29,3 +29,10 @@ Refer to README for any information.
 ## 2.0.0
 
 * Migrated project to support Null-Safety feature.
+
+## 2.1.0
+
+* Fixed bug [#12](https://github.com/Samurai016/Audiotagger/issues/12).
+* Improved behavior of `readTags` method.
+* Migrated [`AudiotaggerPlugin.java`](https://github.com/Samurai016/Audiotagger/blob/master/android/src/main/java/com/nicolorebaioli/audiotagger/AudiotaggerPlugin.java) to [1.12 Flutter plugin APIs](https://flutter.dev/docs/development/packages-and-plugins/plugin-api-migration).
+* Improved testing files.
