@@ -7,6 +7,7 @@ import android.net.Uri;
 
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
+import org.jaudiotagger.audio.AudioHeader;
 import org.jaudiotagger.tag.FieldDataInvalidException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
@@ -92,6 +93,12 @@ public class AudiotaggerPlugin implements MethodCallHandler, FlutterPlugin {
             case "readArtwork":
                 if (call.hasArgument("path"))
                     result.success(readArtwork((String) call.argument("path")));
+                else
+                    result.error("400", "Missing parameter", null);
+                break;
+            case "readAudioFile":
+                if (call.hasArgument("path"))
+                    result.success(readAudioFile((String) call.argument("path")));
                 else
                     result.error("400", "Missing parameter", null);
                 break;
@@ -229,6 +236,31 @@ public class AudiotaggerPlugin implements MethodCallHandler, FlutterPlugin {
                 if (artwork != null)
                     return artwork.getBinaryData();
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private Map<String, Object> readAudioFile(String path) {
+        try {
+            File mp3File = new File(path);
+            AudioFile audioFile = AudioFileIO.read(mp3File);
+
+            Map<String, Object> map = new HashMap<>();
+            AudioHeader audioHeader = audioFile.getAudioHeader();
+
+            if (audioHeader != null) {
+                map.put("length", audioHeader.getTrackLength());
+                map.put("bitRate", audioHeader.getBitRateAsNumber());
+                map.put("channels", audioHeader.getChannels());
+                map.put("encodingType", audioHeader.getEncodingType());
+                map.put("format", audioHeader.getFormat());
+                map.put("sampleRate", audioHeader.getSampleRateAsNumber());
+                map.put("isVariableBitRate", audioHeader.isVariableBitRate());
+            }
+
+            return map;
         } catch (Exception e) {
             e.printStackTrace();
         }

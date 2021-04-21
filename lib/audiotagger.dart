@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:audiotagger/models/audiofile.dart';
 import 'package:flutter/services.dart';
 
 import 'models/tag.dart';
@@ -21,7 +22,7 @@ class Audiotagger {
   ///
   /// [path]: The path of the file.
   ///
-  /// [tags]: A map of the tags.
+  /// [tags]: A `Map` of the tags.
   ///
   /// [artwork]: The file path of the song artwork.
   ///
@@ -44,7 +45,7 @@ class Audiotagger {
   ///
   /// [path]: The path of the file.
   ///
-  /// [tags]: A tag object.
+  /// [tags]: A `Tag` object.
   ///
   /// [artwork]: The file path of the song artwork.
   ///
@@ -91,7 +92,7 @@ class Audiotagger {
   ///
   /// [path]: The path of the file.
   ///
-  /// [return]: A map of the tags
+  /// [return]: A `Map` of the tags
   Future<Map?> readTagsAsMap({
     required String path,
   }) async {
@@ -104,8 +105,8 @@ class Audiotagger {
   ///
   /// [path]: The path of the file.
   ///
-  /// [return]: A tag object of the ID3 tags of the song;
-  Future<Tag> readTags({
+  /// [return]: A `Tag` object of the ID3 tags of the song;
+  Future<Tag?> readTags({
     required String path,
   }) async {
     return Tag.fromMap((await readTagsAsMap(path: path))!);
@@ -122,5 +123,29 @@ class Audiotagger {
     return await _channel.invokeMethod("readArtwork", {
       "path": path,
     });
+  }
+
+  /// Method to get technical information about MP3 file.
+  ///
+  /// [path]: The path of the file.
+  ///
+  /// [return]: An `AudioFile` object.
+  Future<Map?> readAudioFileAsMap({
+    required String path,
+  }) async {
+    return await _channel.invokeMethod("readAudioFile", {
+      "path": path,
+    });
+  }
+
+  /// Method to get technical information about MP3 file.
+  ///
+  /// [path]: The path of the file.
+  ///
+  /// [return]: A `Map` of the informations.
+  Future<AudioFile?> readAudioFile({
+    required String path,
+  }) async {
+    return AudioFile.fromMap((await readAudioFileAsMap(path: path))!);
   }
 }

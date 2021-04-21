@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:audiotagger/models/audiofile.dart';
 import 'package:audiotagger/models/tag.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -88,11 +89,11 @@ void main() {
   });
 
   group("reading", () {
-    test('readTagsFromMap', () async {
+    test('readTagsAsMap', () async {
       final tagger = new Audiotagger();
 
       final path = "storage/emulated/0/Music/test.mp3";
-      final tags = <String, String>{
+      final tagMap = <String, String>{
         "title": "Title of the song",
         "artist": "A fake artist",
         "album": "A fake album",
@@ -103,26 +104,26 @@ void main() {
         path: path,
       );
 
-      expect(result!, tags);
+      expect(result!, tagMap);
     });
 
     test('readTags', () async {
       final tagger = new Audiotagger();
 
       final path = "storage/emulated/0/Music/test.mp3";
-      final tags = <String, String>{
+      final tagMap = <String, String>{
         "title": "Title of the song",
         "artist": "A fake artist",
         "album": "A fake album",
         "year": "2020",
       };
-      final tag = Tag.fromMap(tags);
+      final tag = Tag.fromMap(tagMap);
 
       final result = await tagger.readTags(
         path: path,
       );
 
-      expect(result.toMap(), tag.toMap());
+      expect(result!.toMap(), tag.toMap());
     });
 
     test('readArtwork', () async {
@@ -137,6 +138,49 @@ void main() {
       );
 
       expect(result!, artwork);
+    });
+
+    test('readAudioFileAsMap', () async {
+      final tagger = new Audiotagger();
+
+      final path = "storage/emulated/0/Music/test.mp3";
+      final audiofileMap = <String, dynamic>{
+        "channels": "Stereo",
+        "isVariableBitRate": false,
+        "bitRate": 256,
+        "encodingType": "mp3",
+        "length": 132,
+        "format": "MPEG-1 Layer 3",
+        "sampleRate": 44100
+      };
+
+      final result = await tagger.readAudioFileAsMap(
+        path: path,
+      );
+
+      expect(result!, audiofileMap);
+    });
+
+    test('readAudioFile', () async {
+      final tagger = new Audiotagger();
+
+      final path = "storage/emulated/0/Music/test.mp3";
+      final audiofileMap = <String, dynamic>{
+        "channels": "Stereo",
+        "isVariableBitRate": false,
+        "bitRate": 256,
+        "encodingType": "mp3",
+        "length": 132,
+        "format": "MPEG-1 Layer 3",
+        "sampleRate": 44100
+      };
+      final audiofile = AudioFile.fromMap(audiofileMap);
+
+      final result = await tagger.readAudioFile(
+        path: path,
+      );
+
+      expect(result!.toMap(), audiofile.toMap());
     });
   });
 }

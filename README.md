@@ -2,34 +2,39 @@
 ![build status](https://img.shields.io/badge/build-passing-brightgreen?style=flat-square)
 [![pub](https://img.shields.io/pub/v/audiotagger?style=flat-square)](https://pub.dev/packages/audiotagger)
 
-This library allow you to read and write ID3 tags to MP3 files.
+This library allow you to read and write ID3 tags to MP3 files.  \
+Based on [JAudiotagger](http://www.jthink.net/jaudiotagger/) library.
 
 > **Library actually works only on Android.**
 
 ## Add dependency
 ```yaml
 dependencies:
-  audiotagger: ^2.1.0
+  audiotagger: ^2.2.0
 ```
 Audiotagger need access to read and write storage.  \
 To do this you can use [Permission Handler library](https://pub.dev/packages/permission_handler).
 
 ## Table of contents
-- [Basic usage](#basic-usage-for-any-operation)
+- [Basic usage](#basic-usage)
 - [Reading operations](#reading-operations)
-    - [Read tags as `Map`](#read-tags-as-map)
     - [Read tags as `Tag` object](#read-tags-as-tag-object)
+    - [Read tags as map](#read-tags-as-map)
     - [Read artwork](#read-artwork)
+    - [Read audio file as `AudioFile` object](#read-audio-file-as-audiofile-object)
+    - [Read audio file as map](#read-audio-file-as-map)
 - [Writing operations](#writing-operations)
-    - [Write tags from `Map`](#write-tags-from-map)
+    - [Write tags from map](#write-tags-from-map)
     - [Write tags from `Tag` object](#write-tags-from-tag-object)
     - [Write single tag field](#write-single-tag-field)
 - [Models](#models)
-    - [`Map` of tags](#map-of-tag)
     - [`Tag` class](#tag-class)
+        - [`Map` of `Tag`](#map-of-tag)
+    - [`AudioFile` class](#audiofile-class)
+        - [`Map` of `AudioFile`](#map-of-audiofile)
 
 
-## Basic usage for any operation
+## Basic usage
 Initialize a new instance of the tagger;
 ```dart
 final tagger = new Audiotagger();
@@ -37,22 +42,8 @@ final tagger = new Audiotagger();
 
 ## Reading operations
 
-### Read tags as map
-You can get a `Map` of the ID3 tags.
-```dart
-void getTagsAsMap() async {
-    final String filePath = "/storage/emulated/0/file.mp3";
-    final Map map = await tagger.readTagsAsMap(
-        path: filePath
-    );
-}
-```
-[**This method does not read the artwork of the song. To do this, use the `readArtwork` method.**](#read-artwork)
-
-The map has this schema:[Tag schema](#map-of-tags).
-
 ### Read tags as `Tag` object
-You can get a `Tag` object of the ID3 tags.
+Obtain ID3 tags of the file as a `Tag` object.
 ```dart
 void getTags() async {
     final String filePath = "/storage/emulated/0/file.mp3";
@@ -64,10 +55,24 @@ void getTags() async {
 
 [**This method does not read the artwork of the song. To do this, use the `readArtwork` method.**](#read-artwork)
 
-The `Tag` object has this schema: [Tag schema](#tag-class).
+The `Tag` object has this schema: [`Tag` schema](#tag-class).
+
+### Read tags as map
+Obtain ID3 tags of the file as a `Map`.
+```dart
+void getTagsAsMap() async {
+    final String filePath = "/storage/emulated/0/file.mp3";
+    final Map map = await tagger.readTagsAsMap(
+        path: filePath
+    );
+}
+```
+[**This method does not read the artwork of the song. To do this, use the `readArtwork` method.**](#read-artwork)
+
+The map has this schema: [`Map` of `Tag` schema](#map-of-tag).
 
 ### Read artwork
-To get the artwork of the song, use this method.
+Obtain the artwork of the song as a `Uint8List`.
 ```dart
 void getArtwork() async {
     final String filePath = "/storage/emulated/0/file.mp3";
@@ -77,7 +82,31 @@ void getArtwork() async {
 }
 ```
 
-It return a `Uint8List` of the bytes of the artwork.
+### Read audio file as `AudioFile` object
+Obtain informations about the MP3 file as a `Tag` object.
+```dart
+void getAudioFile() async {
+    final String filePath = "/storage/emulated/0/file.mp3";
+    final AudioFile audioFile = await tagger.readAudioFile(
+        path: filePath
+    );
+}
+```
+
+The `AudioFile` object has this schema: [`AudioFile` schema](#audiofile-class).
+
+### Read audio file as map
+Obtain informations about the MP3 file as a `Map`.
+```dart
+void getAudioFileAsMap() async {
+    final String filePath = "/storage/emulated/0/file.mp3";
+    final Map map = await tagger.readAudioFileAsMap(
+        path: filePath
+    );
+}
+```
+
+The map has this schema: [`Map` of `AudioFile` schema](#map-of-audiofile).
 
 ## Writing operations
 
@@ -103,7 +132,7 @@ void setTagsFromMap() async {
 }
 ```
 
-The map has this schema:[Tag schema](#map-of-tags).
+The map has this schema: [`Map` of `Tag` schema](#map-of-tag).
 
 ### Write tags from `Tag` object
 You can write the ID3 tags from a `Tag` object.  \
@@ -127,7 +156,7 @@ void setTags() async {
 }
 ```
 
-The `Tag` object has this schema: [Tag schema](#tag-class).
+The `Tag` object has this schema: [`Tag` schema](#tag-class).
 
 ### Write single tag field
 You can write a single tag field by specifying the field name.  \
@@ -146,13 +175,30 @@ void setTags() async {
 }
 ```
 
-Refer to [map of tags](#map-of-tag) for fields name.
+Refer to [`Map` of `Tag` schema](#map-of-tag) for fields name.
 
 ## Models
 
-These are the schemes of the `Map` asked and returned by Audiotagger and of the `Tag` class.
+These are the schemes of the `Map` and classes asked and returned by Audiotagger.
 
-### `Map` of tags
+### `Tag` class
+```dart
+String? title;
+String? artist;
+String? genre;
+String? trackNumber;
+String? trackTotal;
+String? discNumber;
+String? discTotal;
+String? lyrics;
+String? comment;
+String? album;
+String? albumArtist;
+String? year;
+String? artwork; // It represents the file path of the song artwork.
+```
+
+### `Map` of `Tag`
 ```dart
 <String, String>{
     "title": value,
@@ -171,21 +217,28 @@ These are the schemes of the `Map` asked and returned by Audiotagger and of the 
 };
 ```
 
-### Tag class
+### `AudioFile` class
 ```dart
-    String title;
-    String artist;
-    String genre;
-    String trackNumber;
-    String trackTotal;
-    String discNumber;
-    String discTotal;
-    String lyrics;
-    String comment;
-    String album;
-    String albumArtist;
-    String year;
-    String artwork; // It represents the file path of the song artwork.
+int? length;
+int? bitRate;
+String? channels;
+String? encodingType;
+String? format;
+int? sampleRate;
+bool? isVariableBitRate;
+```
+
+### `Map` of `AudioFile`
+```dart
+<String, dynamic?>{
+    "length": length,
+    "bitRate": bitRate,
+    "channels": channels,
+    "encodingType": encodingType,
+    "format": format,
+    "sampleRate": sampleRate,
+    "isVariableBitRate": isVariableBitRate,
+};
 ```
 
 ## Copyright and license
@@ -195,4 +248,4 @@ This library is developed and maintained by Nicolò Rebaioli
 
 Released under [MIT license](LICENSE)
 
-Copyright 2019 Nicolò Rebaioli
+Copyright 2021 Nicolò Rebaioli

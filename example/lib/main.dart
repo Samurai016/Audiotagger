@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:audiotagger/audiotagger.dart';
 import 'package:audiotagger/models/tag.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 void main() => runApp(MyApp());
@@ -14,7 +15,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final filePath = "/storage/emulated/0/Download/test.mp3";
+  final filePath = "/sdcard/test.mp3";
+  final artwork = "/sdcard/cover.jpg";
   Widget result;
   Audiotagger tagger = new Audiotagger();
 
@@ -31,7 +33,6 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future _writeTags() async {
-    String artwork = "/storage/emulated/0/Download/cover.jpg";
     Tag tags = Tag(
       title: "Title of the song",
       artist: "A fake artist",
@@ -50,7 +51,7 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  Future _readTags() async {
+  Future _readTag() async {
     final output = await tagger.readTagsAsMap(
       path: filePath,
     );
@@ -68,6 +69,17 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  Future _readAudioFile() async {
+    final output = await tagger.readAudioFileAsMap(
+      path: filePath,
+    );
+    final json = jsonEncode(output);
+    Clipboard.setData(new ClipboardData(text: json));
+    setState(() {
+      result = Text(json);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -82,13 +94,19 @@ class _MyAppState extends State<MyApp> {
               ElevatedButton(
                 child: Text("Read tags"),
                 onPressed: () async {
-                  await _readTags();
+                  await _readTag();
                 },
               ),
               ElevatedButton(
                 child: Text("Read artwork"),
                 onPressed: () async {
                   await _readArtwork();
+                },
+              ),
+              ElevatedButton(
+                child: Text("Read audio file"),
+                onPressed: () async {
+                  await _readAudioFile();
                 },
               ),
               ElevatedButton(
