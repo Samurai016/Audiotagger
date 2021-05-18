@@ -43,3 +43,8 @@ Refer to README for any information.
 * Added `readAudioFile` and `readAudioFileAsMap` methods (solved [issue #14](https://github.com/Samurai016/Audiotagger/issues/14)).
 * Fixed small bugs.
 * Updated documentation.
+
+## 2.2.1
+
+* Fixed [issue #15](https://github.com/Samurai016/Audiotagger/issues/15).
+* Updated documentation.

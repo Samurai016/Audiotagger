@@ -5,14 +5,17 @@ import android.content.Context;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 
+import org.jaudiotagger.StandardCharsets;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.AudioHeader;
+import org.jaudiotagger.audio.mp3.MP3File;
 import org.jaudiotagger.tag.FieldDataInvalidException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.flac.FlacTag;
 import org.jaudiotagger.tag.id3.valuepair.ImageFormats;
+import org.jaudiotagger.tag.id3.ID3v23Tag;
 import org.jaudiotagger.tag.images.Artwork;
 import org.jaudiotagger.tag.images.ArtworkFactory;
 import org.jaudiotagger.tag.mp4.Mp4Tag;
@@ -25,6 +28,7 @@ import java.io.File;
 import java.io.RandomAccessFile;
 import java.util.HashMap;
 import java.util.Map;
+import java.nio.charset.Charset;
 
 import io.flutter.Log;
 import io.flutter.plugin.common.MethodCall;
@@ -112,9 +116,20 @@ public class AudiotaggerPlugin implements MethodCallHandler, FlutterPlugin {
             File mp3File = new File(path);
             AudioFile audioFile = AudioFileIO.read(mp3File);
 
+            
             Tag newTag = audioFile.getTag();
             if (newTag==null)
                 throw new Exception("File tag not found");
+            
+            // Convert ID3v1 tag to ID3v23
+            if (audioFile instanceof MP3File) {
+                MP3File mp3 = (MP3File) audioFile;
+                if (mp3.hasID3v1Tag() && !mp3.hasID3v2Tag()) {
+                    newTag = new ID3v23Tag(mp3.getID3v1Tag());
+                    mp3.setID3v1Tag(null);  // remove v1 tags
+                    mp3.setTag(newTag);     // add v2 tags
+                }
+            }
 
             Util.setFieldIfExist(newTag, FieldKey.TITLE, map, "title");
             Util.setFieldIfExist(newTag, FieldKey.ARTIST, map, "artist");
@@ -178,17 +193,12 @@ public class AudiotaggerPlugin implements MethodCallHandler, FlutterPlugin {
 
             String[] urls = {path};
             String[] mimes = {"audio/mpeg"};
-            MediaScannerConnection.scanFile(
-                    context,
-                    urls,
-                    mimes,
-                    new MediaScannerConnection.OnScanCompletedListener() {
-                        @Override
-                        public void onScanCompleted(String path, Uri uri) {
-                            Log.i("Audiotagger", "Media scanning success");
-                        }
-                    }
-            );
+            MediaScannerConnection.scanFile(context, urls, mimes, new MediaScannerConnection.OnScanCompletedListener() {
+                @Override
+                public void onScanCompleted(String path, Uri uri) {
+                    Log.i("Audiotagger", "Media scanning success");
+                }
+            });
             return true;
         } catch (Exception e) {
             e.printStackTrace();

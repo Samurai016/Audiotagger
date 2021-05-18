@@ -99,6 +99,11 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag
      */
     protected byte genre = (byte) -1;
 
+    /**
+     *
+     */
+    protected Charset encoding = StandardCharsets.UTF_16;
+
 
     private static final byte RELEASE = 1;
     private static final byte MAJOR_VERSION = 0;
@@ -683,6 +688,7 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag
     @Override
     public boolean setEncoding(final Charset encoding)
     {
+        this.encoding = encoding;
         return true;
     }
 
@@ -706,7 +712,7 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag
 
     public Charset getEncoding()
     {
-        return StandardCharsets.ISO_8859_1;
+        return this.encoding;
     }
 
     public TagField getFirstField(FieldKey genericKey)
@@ -923,19 +929,19 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag
         byte[] dataBuffer = new byte[TAG_LENGTH];
         byteBuffer.position(0);
         byteBuffer.get(dataBuffer, 0, TAG_LENGTH);
-        title = new String(dataBuffer, FIELD_TITLE_POS, FIELD_TITLE_LENGTH, StandardCharsets.ISO_8859_1).trim();
+        title = new String(dataBuffer, FIELD_TITLE_POS, FIELD_TITLE_LENGTH, this.encoding).trim();
         Matcher m = AbstractID3v1Tag.endofStringPattern.matcher(title);
         if (m.find())
         {
             title = title.substring(0, m.start());
         }
-        artist = new String(dataBuffer, FIELD_ARTIST_POS, FIELD_ARTIST_LENGTH, StandardCharsets.ISO_8859_1).trim();
+        artist = new String(dataBuffer, FIELD_ARTIST_POS, FIELD_ARTIST_LENGTH, this.encoding).trim();
         m = AbstractID3v1Tag.endofStringPattern.matcher(artist);
         if (m.find())
         {
             artist = artist.substring(0, m.start());
         }
-        album = new String(dataBuffer, FIELD_ALBUM_POS, FIELD_ALBUM_LENGTH, StandardCharsets.ISO_8859_1).trim();
+        album = new String(dataBuffer, FIELD_ALBUM_POS, FIELD_ALBUM_LENGTH, this.encoding).trim();
         m = AbstractID3v1Tag.endofStringPattern.matcher(album);
         logger.finest(getLoggingFilename() + ":" + "Orig Album is:" + comment + ":");
         if (m.find())
@@ -943,13 +949,13 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag
             album = album.substring(0, m.start());
             logger.finest(getLoggingFilename() + ":" + "Album is:" + album + ":");
         }
-        year = new String(dataBuffer, FIELD_YEAR_POS, FIELD_YEAR_LENGTH, StandardCharsets.ISO_8859_1).trim();
+        year = new String(dataBuffer, FIELD_YEAR_POS, FIELD_YEAR_LENGTH, this.encoding).trim();
         m = AbstractID3v1Tag.endofStringPattern.matcher(year);
         if (m.find())
         {
             year = year.substring(0, m.start());
         }
-        comment = new String(dataBuffer, FIELD_COMMENT_POS, FIELD_COMMENT_LENGTH, StandardCharsets.ISO_8859_1).trim();
+        comment = new String(dataBuffer, FIELD_COMMENT_POS, FIELD_COMMENT_LENGTH, this.encoding).trim();
         m = AbstractID3v1Tag.endofStringPattern.matcher(comment);
         logger.finest(getLoggingFilename() + ":" + "Orig Comment is:" + comment + ":");
         if (m.find())

@@ -3,14 +3,14 @@
 [![pub](https://img.shields.io/pub/v/audiotagger?style=flat-square)](https://pub.dev/packages/audiotagger)
 
 This library allow you to read and write ID3 tags to MP3 files.  \
-Based on [JAudiotagger](http://www.jthink.net/jaudiotagger/) library.
+Based on **JAudiotagger** library.
 
 > **Library actually works only on Android.**
 
 ## Add dependency
 ```yaml
 dependencies:
-  audiotagger: ^2.2.0
+  audiotagger: ^2.2.1
 ```
 Audiotagger need access to read and write storage.  \
 To do this you can use [Permission Handler library](https://pub.dev/packages/permission_handler).

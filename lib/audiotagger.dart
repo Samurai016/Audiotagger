@@ -14,6 +14,7 @@ import 'models/tag.dart';
 class Audiotagger {
   late MethodChannel _channel;
 
+  /// Default constructor for Audiotagger class
   Audiotagger() {
     _channel = MethodChannel('audiotagger');
   }

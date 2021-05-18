@@ -51,7 +51,7 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  Future _readTag() async {
+  Future _readTags() async {
     final output = await tagger.readTagsAsMap(
       path: filePath,
     );
@@ -94,7 +94,7 @@ class _MyAppState extends State<MyApp> {
               ElevatedButton(
                 child: Text("Read tags"),
                 onPressed: () async {
-                  await _readTag();
+                  await _readTags();
                 },
               ),
               ElevatedButton(
