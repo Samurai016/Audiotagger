@@ -25,7 +25,6 @@ android {
     compileSdkVersion 28
      namespace = "com.nicolorebaioli.audiotagger"
     defaultConfig {
-        applicationId "com.nicolorebaioli.audiotagger"
         minSdkVersion 16
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles 'proguard-rules.pro'
