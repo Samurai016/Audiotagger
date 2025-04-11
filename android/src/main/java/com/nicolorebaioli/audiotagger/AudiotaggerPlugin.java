@@ -48,12 +48,6 @@ public class AudiotaggerPlugin implements MethodCallHandler, FlutterPlugin {
     private Context context;
     private MethodChannel channel;
 
-    /* Plugin registration */
-    @SuppressWarnings("deprecation")
-    public static void registerWith(io.flutter.plugin.common.PluginRegistry.Registrar registrar) {
-        final AudiotaggerPlugin instance = new AudiotaggerPlugin();
-        instance.onAttachedToEngine(registrar.context(), registrar.messenger());
-    }
 
     @Override
     public void onAttachedToEngine(FlutterPluginBinding binding) {
